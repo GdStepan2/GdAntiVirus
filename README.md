@@ -1,4 +1,6 @@
 # GdAntiVirus
+!BEFORE LAUNCHING!
+
 
 !ENG
 1. Make sure you have Python installed
