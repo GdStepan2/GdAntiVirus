@@ -2,6 +2,8 @@
 
 !ENG
 
+The sources will be published in version 2.1. I want to correct the code there.
+
 THE APP HAS BEEN UPDATED TO 2.0. PLEASE UPDATE THE APP.
 
 This program helps fight viruses. It has its own built-in task manager, a simple menu for launching system applications, system information, convenient settings, etc.
@@ -10,6 +12,8 @@ The program's source code will be open sourced after support ends. If you find a
 
 
 !RU
+
+Исходники будут опубликованы в 2.1 версии. Хочу поправить код там. 
 
 ПРИЛОЖЕНИЕ БЫЛО ОБНОВЛЕНО ДО 2.0 ПРОСЬБА ОБНОВИТЬ ПРИЛОЖЕНИЕ
 
