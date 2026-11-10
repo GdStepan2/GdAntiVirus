@@ -1,0 +1,90 @@
+<Window x:Class="GdAntiVirus.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GdAntiVirus" Width="1200" Height="780" MinWidth="960" MinHeight="620"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
+        Background="{StaticResource WindowBrush}" Foreground="{StaticResource TextBrush}"
+        FontFamily="{StaticResource UiFont}" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="40" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid x:Name="Root">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Title bar -->
+        <Grid Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
+                <Image Source="pack://application:,,,/Assets/logo.png" Width="18" Height="18" RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="GdAntiVirus" Margin="10,0,0,0" FontSize="12" VerticalAlignment="Center"/>
+                <TextBlock x:Name="VersionText" Margin="6,0,0,0" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{StaticResource TextTertiaryBrush}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button x:Name="MinButton" Style="{StaticResource TitleBarButton}" Content="&#xE921;" ToolTip="Свернуть"
+                        WindowChrome.IsHitTestVisibleInChrome="True" Click="OnMinimize"/>
+                <Button x:Name="MaxButton" Style="{StaticResource TitleBarButton}" Content="&#xE922;" ToolTip="Развернуть"
+                        WindowChrome.IsHitTestVisibleInChrome="True" Click="OnMaximize"/>
+                <Button x:Name="CloseButton" Style="{StaticResource TitleBarCloseButton}" Content="&#xE8BB;" ToolTip="Закрыть"
+                        WindowChrome.IsHitTestVisibleInChrome="True" Click="OnClose"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Sidebar -->
+        <DockPanel Grid.Row="1" Margin="8,0,8,8">
+            <Border DockPanel.Dock="Top" Margin="6,6,6,12" Padding="12,10" CornerRadius="6" Background="{StaticResource NavHoverBrush}">
+                <StackPanel Orientation="Horizontal">
+                    <Grid Width="36" Height="36">
+                        <Ellipse x:Name="StatusDot" Fill="{StaticResource SuccessBrush}" Opacity="0.18"/>
+                        <TextBlock x:Name="StatusIcon" Text="&#xEA18;" FontFamily="{StaticResource IconFont}" FontSize="18"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource SuccessBrush}"/>
+                    </Grid>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="StatusTitle" Text="Проверка…" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="StatusSub" Text="GdAntiVirus" FontSize="11" Foreground="{StaticResource TextTertiaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <StackPanel x:Name="NavBottom" DockPanel.Dock="Bottom" Margin="0,8,0,0"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="NavTop"/>
+            </ScrollViewer>
+        </DockPanel>
+
+        <!-- Content -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource ContentBrush}" CornerRadius="8,0,0,0"
+                BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1,1,0,0">
+            <Grid Margin="36,26,20,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="0,0,16,16">
+                    <TextBlock x:Name="PageTitle" Style="{StaticResource PageTitle}"/>
+                    <TextBlock x:Name="PageSubtitle" Style="{StaticResource Caption}" FontSize="13" Margin="0,4,0,0"/>
+                </StackPanel>
+                <ContentControl x:Name="PageHost" Grid.Row="1" Focusable="False"/>
+            </Grid>
+        </Border>
+
+        <!-- Toast -->
+        <Border x:Name="ToastBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Margin="0,0,0,24" Padding="16,11" CornerRadius="8" Background="#333333" BorderBrush="#26FFFFFF"
+                BorderThickness="1" Visibility="Collapsed" Opacity="0" IsHitTestVisible="False">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.45" Color="Black"/>
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="ToastIcon" FontFamily="{StaticResource IconFont}" FontSize="16" VerticalAlignment="Center"/>
+                <TextBlock x:Name="ToastText" Margin="12,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="620" FontSize="13"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
