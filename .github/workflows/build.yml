@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build
+        run: dotnet build src/GdAntiVirus/GdAntiVirus.csproj -c Release
+
+      - name: Self-test (opens every page)
+        shell: pwsh
+        run: |
+          $exe = "src/GdAntiVirus/bin/Release/net48/GdAntiVirus.exe"
+          $result = Join-Path $env:RUNNER_TEMP "selftest.txt"
+          $p = Start-Process -FilePath $exe -ArgumentList "--selftest", "`"$result`"" -PassThru
+          if (-not $p.WaitForExit(120000)) { $p.Kill(); throw "Self-test timed out" }
+          if (-not (Test-Path $result)) { throw "Self-test produced no result (exit code $($p.ExitCode))" }
+          Get-Content $result
+          if ((Get-Content $result -Raw).Trim() -ne "OK") { throw "Self-test failed" }
+          $log = Join-Path $env:APPDATA "GdAntiVirus\logs\gdantivirus.log"
+          if (Test-Path $log) { Get-Content $log }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GdAntiVirus
+          path: src/GdAntiVirus/bin/Release/net48/GdAntiVirus.exe
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: ${{ runner.temp }}/screens
+          if-no-files-found: ignore
