@@ -31,12 +31,13 @@ namespace GdAntiVirus.Pages
         {
             var root = new DockPanel();
 
-            _search = Ui.Input("Поиск по имени, описанию или пути…", 300);
+            _search = Ui.Input("Поиск по имени, описанию или пути…", 260);
+            _search.Margin = new Thickness(0, 0, 8, 8);
             _search.TextChanged += (s, e) => ApplyFilter();
-            _auto = new CheckBox { Content = "Автообновление", Margin = new Thickness(16, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
+            _auto = new CheckBox { Content = "Автообновление", Margin = new Thickness(8, 0, 0, 8), VerticalAlignment = VerticalAlignment.Center };
             _auto.Checked += (s, e) => _timer.Start();
             _auto.Unchecked += (s, e) => _timer.Stop();
-            var toolbar = new WrapPanel { Margin = new Thickness(0, 0, 0, 10) };
+            var toolbar = new WrapPanel { Margin = new Thickness(0, 0, 0, 2) };
             toolbar.Children.Add(_search);
             foreach (var b in new[]
             {
@@ -47,7 +48,7 @@ namespace GdAntiVirus.Pages
                 Ui.Button("Проверить", ScanSelected, glyph: "\uE721"),
             })
             {
-                b.Margin = new Thickness(8, 0, 0, 0);
+                b.Margin = new Thickness(0, 0, 8, 8);
                 toolbar.Children.Add(b);
             }
             toolbar.Children.Add(_auto);
@@ -69,11 +70,29 @@ namespace GdAntiVirus.Pages
             _list = new ListView { View = view, SelectionMode = SelectionMode.Single };
             _list.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(OnHeaderClick));
             _list.MouseDoubleClick += (s, e) => { var r = Current(); if (r?.Path != null) Shell.ShowInExplorer(r.Path); };
+            // The GridView ScrollViewer template paints a light system-colour corner square.
+            _list.Loaded += (s, e) =>
+            {
+                foreach (var rect in Descendants<System.Windows.Shapes.Rectangle>(_list))
+                    if (rect.Fill is System.Windows.Media.SolidColorBrush b && b.Color == SystemColors.ControlColor)
+                        rect.Fill = System.Windows.Media.Brushes.Transparent;
+            };
             root.Children.Add(Ui.Card(_list, new Thickness(8)));
 
             Content = root;
             _timer.Tick += (s, e) => Reload();
             IsVisibleChanged += (s, e) => { if (!IsVisible) _timer.Stop(); else if (_auto.IsChecked == true) _timer.Start(); };
+        }
+
+        private static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject
+        {
+            int n = System.Windows.Media.VisualTreeHelper.GetChildrenCount(root);
+            for (int i = 0; i < n; i++)
+            {
+                var c = System.Windows.Media.VisualTreeHelper.GetChild(root, i);
+                if (c is T t) yield return t;
+                foreach (var d in Descendants<T>(c)) yield return d;
+            }
         }
 
         private static GridViewColumn Col(string header, string prop, double width, string sortKey = null)
@@ -266,7 +285,7 @@ namespace GdAntiVirus.Pages
         protected override void Build()
         {
             var root = new StackPanel();
-            _total = Ui.Text("Нажмите «Анализ», чтобы узнать, сколько места можно освободить", 15, FontWeights.SemiBold);
+            _total = Ui.Text("Нажмите «Анализ», чтобы узнать объём мусора", 15, FontWeights.SemiBold);
             _spinner = Ui.Spinner(22);
             _spinner.Visibility = Visibility.Collapsed;
             _spinner.Margin = new Thickness(0, 0, 14, 0);
@@ -276,7 +295,8 @@ namespace GdAntiVirus.Pages
             var hb = Ui.HStack(_analyze, _clean);
             DockPanel.SetDock(hb, Dock.Right);
             head.Children.Add(hb);
-            head.Children.Add(Ui.HStack(_spinner, _total));
+            head.Children.Add(_spinner);
+            head.Children.Add(_total);
             var sub = Ui.Caption($"Всего освобождено с помощью GdAntiVirus: {Fmt.Size(AppSettings.TotalCleaned)}");
             var hp = new StackPanel();
             hp.Children.Add(head);

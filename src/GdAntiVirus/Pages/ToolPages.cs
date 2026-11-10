@@ -82,7 +82,7 @@ namespace GdAntiVirus.Pages
             icBg.SetResourceReference(Border.BackgroundProperty, "AccentSoftBrush");
             g.Children.Add(icBg);
             var info = new StackPanel { Margin = new Thickness(12, 0, 8, 0) };
-            info.Children.Add(Ui.Text(app.Name, 14, FontWeights.SemiBold, wrap: false));
+            info.Children.Add(Ui.Text(app.Name, 14, FontWeights.SemiBold));
             info.Children.Add(Ui.Caption(app.Description));
             info.Children.Add(status);
             Grid.SetColumn(info, 1); g.Children.Add(info);

@@ -70,7 +70,7 @@ namespace GdAntiVirus.Pages
             var res = new UniformGrid { Columns = 3 };
             res.Children.Add(Meter("\uE950", "Процессор", out _cpuBar, out _cpuText));
             res.Children.Add(Meter("\uE964", "Память", out _ramBar, out _ramText));
-            res.Children.Add(Meter("\uEDA2", "Системный диск", out _diskBar, out _diskText));
+            res.Children.Add(Meter("\uEDA2", "Диск " + Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).TrimEnd('\\'), out _diskBar, out _diskText));
             root.Children.Add(res);
 
             // Quick actions
@@ -163,7 +163,7 @@ namespace GdAntiVirus.Pages
             {
                 var d = new DriveInfo(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)));
                 _diskBar.Value = 100.0 * (d.TotalSize - d.TotalFreeSpace) / d.TotalSize;
-                _diskText.Text = $"свободно {Fmt.Size(d.TotalFreeSpace)}";
+                _diskText.Text = $"{Fmt.Size(d.TotalFreeSpace)} своб.";
                 _diskBar.Foreground = d.TotalFreeSpace < 10L * 1024 * 1024 * 1024 ? Ui.B("WarningBrush") : null;
                 if (_diskBar.Foreground == null) _diskBar.ClearValue(ForegroundProperty);
             }
@@ -194,9 +194,12 @@ namespace GdAntiVirus.Pages
             _issues.Children.Clear();
             foreach (var issue in s.Issues)
             {
-                var line = Ui.HStack(Ui.Icon("\uE76C", 10, Ui.B("TextTertiaryBrush")), Ui.Text(issue, 13, null, "TextSecondaryBrush"));
-                ((FrameworkElement)line.Children[1]).Margin = new Thickness(8, 0, 0, 0);
-                line.Margin = new Thickness(0, 3, 0, 0);
+                var line = new DockPanel { Margin = new Thickness(0, 3, 0, 0) };
+                var bullet = Ui.Icon("\uE76C", 10, Ui.B("TextTertiaryBrush"));
+                bullet.Margin = new Thickness(0, 3, 8, 0);
+                bullet.VerticalAlignment = VerticalAlignment.Top;
+                line.Children.Add(bullet);
+                line.Children.Add(Ui.Text(issue, 13, null, "TextSecondaryBrush"));
                 _issues.Children.Add(line);
             }
 
