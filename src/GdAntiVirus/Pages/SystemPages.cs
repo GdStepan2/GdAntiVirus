@@ -68,31 +68,15 @@ namespace GdAntiVirus.Pages
             view.Columns.Add(StatusCol());
             view.Columns.Add(Col("Путь", "Path", 420));
             _list = new ListView { View = view, SelectionMode = SelectionMode.Single };
+            // No horizontal scrolling: the GridView ScrollViewer template paints a light system-colour corner square.
+            ScrollViewer.SetHorizontalScrollBarVisibility(_list, ScrollBarVisibility.Disabled);
             _list.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(OnHeaderClick));
             _list.MouseDoubleClick += (s, e) => { var r = Current(); if (r?.Path != null) Shell.ShowInExplorer(r.Path); };
-            // The GridView ScrollViewer template paints a light system-colour corner square.
-            _list.Loaded += (s, e) =>
-            {
-                foreach (var rect in Descendants<System.Windows.Shapes.Rectangle>(_list))
-                    if (rect.Fill is System.Windows.Media.SolidColorBrush b && b.Color == SystemColors.ControlColor)
-                        rect.Fill = System.Windows.Media.Brushes.Transparent;
-            };
             root.Children.Add(Ui.Card(_list, new Thickness(8)));
 
             Content = root;
             _timer.Tick += (s, e) => Reload();
             IsVisibleChanged += (s, e) => { if (!IsVisible) _timer.Stop(); else if (_auto.IsChecked == true) _timer.Start(); };
-        }
-
-        private static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject
-        {
-            int n = System.Windows.Media.VisualTreeHelper.GetChildrenCount(root);
-            for (int i = 0; i < n; i++)
-            {
-                var c = System.Windows.Media.VisualTreeHelper.GetChild(root, i);
-                if (c is T t) yield return t;
-                foreach (var d in Descendants<T>(c)) yield return d;
-            }
         }
 
         private static GridViewColumn Col(string header, string prop, double width, string sortKey = null)
