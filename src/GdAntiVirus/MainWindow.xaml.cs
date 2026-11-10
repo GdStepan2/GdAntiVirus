@@ -186,9 +186,12 @@ namespace GdAntiVirus
         private void RunSelfTest()
         {
             int i = 0;
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1500) };
+            var shots = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(App.SelfTestResultFile)), "screens");
+            System.IO.Directory.CreateDirectory(shots);
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2500) };
             timer.Tick += (s, e) =>
             {
+                if (i > 0) SaveScreenshot(System.IO.Path.Combine(shots, $"{i:00}-{_entries[i - 1].PageType.Name}.png"));
                 if (i < _entries.Count)
                 {
                     Log.Info("selftest: " + _entries[i].Text);
@@ -196,10 +199,26 @@ namespace GdAntiVirus
                     return;
                 }
                 timer.Stop();
-                Toast("Самопроверка пройдена", ToastKind.Success);
                 App.Pass();
             };
             timer.Start();
+        }
+
+        private void SaveScreenshot(string file)
+        {
+            var dpi = VisualTreeHelper.GetDpi(this);
+            var bmp = new System.Windows.Media.Imaging.RenderTargetBitmap((int)(ActualWidth * dpi.DpiScaleX), (int)(ActualHeight * dpi.DpiScaleY),
+                dpi.PixelsPerInchX, dpi.PixelsPerInchY, PixelFormats.Pbgra32);
+            var dv = new DrawingVisual();
+            using (var dc = dv.RenderOpen())
+            {
+                dc.DrawRectangle(Background, null, new Rect(0, 0, ActualWidth, ActualHeight));
+                dc.DrawRectangle(new VisualBrush(Root), null, new Rect(0, 0, ActualWidth, ActualHeight));
+            }
+            bmp.Render(dv);
+            var enc = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            enc.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bmp));
+            using (var fs = System.IO.File.Create(file)) enc.Save(fs);
         }
     }
 }

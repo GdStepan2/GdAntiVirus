@@ -35,3 +35,10 @@ jobs:
         with:
           name: GdAntiVirus
           path: src/GdAntiVirus/bin/Release/net48/GdAntiVirus.exe
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: ${{ runner.temp }}/screens
+          if-no-files-found: ignore
